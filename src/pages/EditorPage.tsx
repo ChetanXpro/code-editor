@@ -1,13 +1,32 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import { ACTIONS } from '../action'
 import Client from '../components/Client'
 import Editor from '../components/Editor'
-
+import { initSocket } from '../socket'
 
 const EditorPage = () => {
   const [clients, setClients] = useState([
     { socketId: 1, username: 'Chetan baliyan' },
     { socketId: 2, username: 'Sagar singh' },
   ])
+  const location = useLocation()
+  const socketRef = useRef(null) as any
+
+  useEffect(() => {
+
+    const init = async () => {
+      socketRef.current = await initSocket()
+      socketRef.current.emit(ACTIONS.JOIN, {
+        'roomId',
+        username: location.state?.username
+      });
+    }
+
+    init()
+
+  }, [])
+
   return (
     <div className="mainWrap h-screen ">
       <div className="aside  h-[100%] " >
