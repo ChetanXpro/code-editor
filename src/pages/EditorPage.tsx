@@ -35,10 +35,8 @@ const EditorPage = () => {
           Leave
         </button>
       </div>
-      <div className="editorWrap bg-red-200">
-        <Editor
-
-        />
+      <div className="editorWrap ">
+        <Editor />
       </div>
     </div>
   )
