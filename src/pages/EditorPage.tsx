@@ -1,28 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ACTIONS } from '../action'
 import Client from '../components/Client'
 import Editor from '../components/Editor'
 import { initSocket } from '../socket'
-
+import toast from 'react-hot-toast';
 const EditorPage = () => {
   const [clients, setClients] = useState([
     { socketId: 1, username: 'Chetan baliyan' },
     { socketId: 2, username: 'Sagar singh' },
   ])
+  const { roomId } = useParams();
+    const reactNavigator = useNavigate();
   const location = useLocation()
   const socketRef = useRef(null) as any
 
   useEffect(() => {
 
     const init = async () => {
+      socketRef.current = await initSocket();
+      socketRef.current.on('connect_error', (err: any) => handleErrors(err));
+      socketRef.current.on('connect_failed', (err: any) => handleErrors(err));
+
       socketRef.current = await initSocket()
       socketRef.current.emit(ACTIONS.JOIN, {
-        'roomId',
+        roomId,
         username: location.state?.username
       });
     }
 
+    function handleErrors(e) {
+      console.log('socket error', e);
+      toast.error('Socket connection failed, try again later.');
+      reactNavigator('/');
+  }
     init()
 
   }, [])

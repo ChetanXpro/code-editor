@@ -10,9 +10,15 @@ const server = http.createServer(app)
 const io = new Server(server)
 
 
-
+const users = {}
 io.on('connection', (socket) => {
     console.log('Socket connected', socket.id)
+
+    socket.on('join', ({ roomId, username }) => {
+        console.log(roomId)
+
+        users[socket.id] = username
+    })
 })
 
 
