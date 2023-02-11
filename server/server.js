@@ -8,16 +8,51 @@ const { Server } = require('socket.io')
 const server = http.createServer(app)
 
 const io = new Server(server)
+const getAllClients = (roomId) => {
+    return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(id => {
 
+        return {
+            id, username: users[id]
+        }
+
+    })
+}
 
 const users = {}
 io.on('connection', (socket) => {
     console.log('Socket connected', socket.id)
 
     socket.on('join', ({ roomId, username }) => {
-        console.log(roomId)
+
 
         users[socket.id] = username
+
+        socket.join(roomId)
+
+        const client = getAllClients(roomId)
+        console.log(client)
+        client.forEach(({ socketId }) => {
+            io.to(socketId).emit('joined', {
+                client, username, socketId
+            })
+        })
+    })
+
+
+    socket.on('disconnecting', () => {
+        const room = [...socket.rooms];
+
+        room.forEach(roomId => {
+            socket.in(roomId).emit('disconnected', {
+                socketId: socket.id,
+                username: users[socket.id]
+            })
+        })
+
+        delete users[socket.id];
+
+        socket.leave()
+
     })
 })
 

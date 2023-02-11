@@ -6,16 +6,16 @@ import Editor from '../components/Editor'
 import { initSocket } from '../socket'
 import toast from 'react-hot-toast';
 const EditorPage = () => {
-  const [clients, setClients] = useState([
-    { socketId: 1, username: 'Chetan baliyan' },
-    { socketId: 2, username: 'Sagar singh' },
-  ])
+  const [clients, setClients] = useState([])
+
+  console.log('client', clients)
   const { roomId } = useParams();
-    const reactNavigator = useNavigate();
+  const reactNavigator = useNavigate();
   const location = useLocation()
   const socketRef = useRef(null) as any
 
   useEffect(() => {
+    // console.log(location.state?.userName)
 
     const init = async () => {
       socketRef.current = await initSocket();
@@ -25,19 +25,58 @@ const EditorPage = () => {
       socketRef.current = await initSocket()
       socketRef.current.emit(ACTIONS.JOIN, {
         roomId,
-        username: location.state?.username
+        username: location.state?.userName
       });
+
+
+
+      socketRef.current.on(ACTIONS.JOINED, ({ client, username, socketId }: any) => {
+        if (username !== location.state?.userName) {
+          toast.success(`${username} joined the room`, { id: "joined" })
+
+        }
+
+        setClients(client)
+      })
+
+
+
+      socketRef.current.on(
+        ACTIONS.DISCONNECTED,
+        ({ socketId, username }: { socketId: any, username: any }) => {
+          toast.success(`${username} left the room.`);
+          setClients((prev) => {
+            return prev.filter(
+              (c) => {
+                console.log(c.id, ':', socketId)
+                console.log(c)
+                return c.id !== socketId
+              }
+            );
+          });
+
+          console.log(clients)
+        }
+      );
+
+
+
+      return () => {
+        socketRef.current.disconnect();
+        socketRef.current.off(ACTIONS.JOINED);
+        socketRef.current.off(ACTIONS.DISCONNECTED);
+      };
     }
 
-    function handleErrors(e) {
-      console.log('socket error', e);
+    function handleErrors(e: any) {
+
       toast.error('Socket connection failed, try again later.');
       reactNavigator('/');
-  }
+    }
     init()
 
-  }, [])
 
+  }, [])
   return (
     <div className="mainWrap h-screen ">
       <div className="aside  h-[100%] " >

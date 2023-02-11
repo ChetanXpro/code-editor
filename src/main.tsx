@@ -11,11 +11,11 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <Toaster position='top-right'></Toaster>
 
     </div>
-    <React.StrictMode>
+    {/* <React.StrictMode> */}
 
       <BrowserRouter>
         <App />
       </BrowserRouter>
-    </React.StrictMode>
+    {/* </React.StrictMode> */}
   </>
 )
