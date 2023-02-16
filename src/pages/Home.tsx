@@ -18,6 +18,7 @@ const Home = () => {
       toast.error('Please fill all details')
       return
     }
+    console.log(roomId)
 
     navigate(`editor/${roomId}`, { state: { userName } })
 

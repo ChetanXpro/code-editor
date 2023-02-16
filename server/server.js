@@ -20,8 +20,7 @@ const getAllClients = (roomId) => {
 
 const users = {}
 io.on('connection', (socket) => {
-    console.log('Socket connected', socket.id)
-
+    
     socket.on('join', ({ roomId, username }) => {
 
 
@@ -38,6 +37,11 @@ io.on('connection', (socket) => {
         })
     })
 
+    socket.on('code_change', ({ roomId, code }) => {
+        console.log('code', code)
+        console.log(roomId)
+        socket.in(roomId).emit('code_change', { code })
+    })
 
     socket.on('disconnecting', () => {
         const room = [...socket.rooms];

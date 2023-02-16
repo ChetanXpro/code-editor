@@ -5,11 +5,13 @@ import 'codemirror/theme/dracula.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/edit/closetag';
 import 'codemirror/addon/edit/closebrackets';
+import { ACTIONS } from '../action';
 
-const Editor = () => {
+const Editor = ({ socketRef, roomId }: any) => {
+    const editorRef = useRef(null) as any
     useEffect(() => {
         async function init() {
-            Codemirror.fromTextArea(
+            editorRef.current = Codemirror.fromTextArea(
                 document.getElementById('editor') as any,
                 {
                     mode: { name: 'javascript', json: true },
@@ -19,9 +21,45 @@ const Editor = () => {
                     lineNumbers: true,
                 }
             );
+
+            editorRef.current.on('change', (instance: any, changes: any) => {
+
+                const code = instance.getValue()
+
+
+                const { origin } = changes;
+
+                if (origin !== 'setValue') {
+                    socketRef.current.emit('code_change', {
+                        roomId,
+                        code,
+                    });
+                    console.log('emit', code)
+                }
+            });
+
+
         }
         init()
     }, []);
+
+
+
+    useEffect(() => {
+        if (socketRef.current) {
+            socketRef.current.on('code_change', ({ code }) => {
+                if (code !== null) {
+                    console.log('Rec',code)
+                    editorRef.current.setValue(code);
+                }
+            });
+        }
+
+        return () => {
+            socketRef.current.off(ACTIONS.CODE_CHANGE);
+        };
+    }, [socketRef.current]);
+
 
     return (
         <textarea name="" id="editor" ></textarea>

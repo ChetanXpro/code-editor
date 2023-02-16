@@ -9,7 +9,8 @@ const EditorPage = () => {
   const [clients, setClients] = useState([])
 
   console.log('client', clients)
-  const { roomId } = useParams();
+  const { roomid } = useParams()
+  
   const reactNavigator = useNavigate();
   const location = useLocation()
   const socketRef = useRef(null) as any
@@ -22,9 +23,9 @@ const EditorPage = () => {
       socketRef.current.on('connect_error', (err: any) => handleErrors(err));
       socketRef.current.on('connect_failed', (err: any) => handleErrors(err));
 
-      socketRef.current = await initSocket()
+
       socketRef.current.emit(ACTIONS.JOIN, {
-        roomId,
+        roomid,
         username: location.state?.userName
       });
 
@@ -55,7 +56,7 @@ const EditorPage = () => {
             );
           });
 
-          console.log(clients)
+
         }
       );
 
@@ -68,6 +69,8 @@ const EditorPage = () => {
       };
     }
 
+
+
     function handleErrors(e: any) {
 
       toast.error('Socket connection failed, try again later.');
@@ -77,9 +80,21 @@ const EditorPage = () => {
 
 
   }, [])
+  const copy = async () => {
+    try {
+      
+      await navigator.clipboard.writeText(roomid || '')
+      toast.success(`Room Id copied`)
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  console.log(clients)
+
   return (
     <div className="mainWrap h-screen ">
-      <div className="aside  h-[100%] " >
+      <div className="aside  h-[100%]" >
         <div className='flex flex-col items-center justify-center h-full'>
 
           <div className="asideInner    ">
@@ -90,14 +105,14 @@ const EditorPage = () => {
             <div className="clientsList ">
               {clients.map((client) => (
                 <Client
-                  key={client.socketId}
+                  key={client.id}
                   username={client.username}
                 />
               ))}
             </div>
           </div>
         </div>
-        <button className="btn copyBtn">
+        <button className="btn copyBtn" onClick={copy}>
           Copy ROOM ID
         </button>
         <button className="btn leaveBtn" >
@@ -105,7 +120,7 @@ const EditorPage = () => {
         </button>
       </div>
       <div className="editorWrap ">
-        <Editor />
+        <Editor roomId={roomid} socketRef={socketRef} />
       </div>
     </div>
   )
