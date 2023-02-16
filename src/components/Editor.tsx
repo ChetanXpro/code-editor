@@ -7,7 +7,7 @@ import 'codemirror/addon/edit/closetag';
 import 'codemirror/addon/edit/closebrackets';
 import { ACTIONS } from '../action';
 
-const Editor = ({ socketRef, roomId }: any) => {
+const Editor = ({ socketRef, roomId, onCodeChange }: any) => {
     const editorRef = useRef(null) as any
     useEffect(() => {
         async function init() {
@@ -26,7 +26,7 @@ const Editor = ({ socketRef, roomId }: any) => {
 
                 const code = instance.getValue()
 
-
+                onCodeChange(code)
                 const { origin } = changes;
 
                 if (origin !== 'setValue') {
@@ -47,9 +47,9 @@ const Editor = ({ socketRef, roomId }: any) => {
 
     useEffect(() => {
         if (socketRef.current) {
-            socketRef.current.on('code_change', ({ code }) => {
+            socketRef.current.on('code_change', ({ code }: any) => {
                 if (code !== null) {
-                    console.log('Rec',code)
+                    console.log('Rec', code)
                     editorRef.current.setValue(code);
                 }
             });

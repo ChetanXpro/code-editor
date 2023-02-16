@@ -6,11 +6,12 @@ import Editor from '../components/Editor'
 import { initSocket } from '../socket'
 import toast from 'react-hot-toast';
 const EditorPage = () => {
+  const codeRef = useRef() as any
   const [clients, setClients] = useState([])
 
   console.log('client', clients)
   const { roomid } = useParams()
-  
+
   const reactNavigator = useNavigate();
   const location = useLocation()
   const socketRef = useRef(null) as any
@@ -38,35 +39,28 @@ const EditorPage = () => {
         }
 
         setClients(client)
+
+
+        socketRef.current.emit('sync_code', { code: codeRef.current, socketId })
       })
 
 
 
       socketRef.current.on(
         ACTIONS.DISCONNECTED,
-        ({ socketId, username }: { socketId: any, username: any }) => {
+        ({ socketId, username }: any) => {
           toast.success(`${username} left the room.`);
           setClients((prev) => {
             return prev.filter(
-              (c) => {
-                console.log(c.id, ':', socketId)
-                console.log(c)
-                return c.id !== socketId
-              }
+              (client) => client.id !== socketId
             );
           });
-
-
         }
       );
 
 
 
-      return () => {
-        socketRef.current.disconnect();
-        socketRef.current.off(ACTIONS.JOINED);
-        socketRef.current.off(ACTIONS.DISCONNECTED);
-      };
+
     }
 
 
@@ -77,12 +71,17 @@ const EditorPage = () => {
       reactNavigator('/');
     }
     init()
-
+    return () => {
+      socketRef.current.disconnect();
+      socketRef.current.off(ACTIONS.JOINED);
+      socketRef.current.off(ACTIONS.DISCONNECTED);
+    };
 
   }, [])
+
   const copy = async () => {
     try {
-      
+
       await navigator.clipboard.writeText(roomid || '')
       toast.success(`Room Id copied`)
 
@@ -90,7 +89,9 @@ const EditorPage = () => {
       console.log(error)
     }
   }
-  console.log(clients)
+  const leaveRoom = () => {
+    reactNavigator('/')
+  }
 
   return (
     <div className="mainWrap h-screen ">
@@ -115,12 +116,14 @@ const EditorPage = () => {
         <button className="btn copyBtn" onClick={copy}>
           Copy ROOM ID
         </button>
-        <button className="btn leaveBtn" >
+        <button className="btn leaveBtn" onClick={leaveRoom} >
           Leave
         </button>
       </div>
       <div className="editorWrap ">
-        <Editor roomId={roomid} socketRef={socketRef} />
+        <Editor roomId={roomid} socketRef={socketRef} onCodeChange={(code: any) => {
+          codeRef.current = code
+        }} />
       </div>
     </div>
   )
