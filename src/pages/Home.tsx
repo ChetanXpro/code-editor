@@ -32,11 +32,11 @@ const Home = () => {
 
   }
   return (
-    <div className="homePageWrapper">
+    <div className="homePageWrapper bg-red-500">
       <div className="formWrapper">
-        <h1 className='mb-6'>Code Sync</h1>
-        <h4 className="mainLabel">Paste invitation ROOM ID</h4>
-        <div className="inputGroup">
+        <h1 className='mb-6'></h1>
+        <h4 className="mainLabel flex items-center justify-center text-lg">Coding Rooms</h4>
+        <div className="inputGroup h-60">
           <input
             type="text"
             value={roomId}
@@ -55,27 +55,22 @@ const Home = () => {
             placeholder="USERNAME"
 
           />
-          <button onClick={joinRoom} className="btn joinBtn" >
+          <button onClick={joinRoom} className="btn bg-blue-500 w-full joinBtn" >
             Join
           </button>
           <span className="createInfo">
-            If you don't have an invite then create &nbsp;
+           don't have an invite ? then create &nbsp;
             <a
               onClick={createNewRoom}
               href=""
-              className="createNewBtn"
+              className="createNewBtn  underline text-blue-500"
             >
               new room
             </a>
           </span>
         </div>
       </div>
-      <footer>
-        <h4>
-          Code sync
-          <a href="https://github.com/chetanXpro">Chetan</a>
-        </h4>
-      </footer>
+      
     </div>
   )
 }

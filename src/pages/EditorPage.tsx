@@ -98,11 +98,11 @@ const EditorPage = () => {
       <div className="aside  h-[100%]" >
         <div className='flex flex-col items-center justify-center h-full'>
 
-          <div className="asideInner    ">
-            <div className="logo">
-              Code sync
+          <div className="asideInner  w-full ">
+            <div className="logo text-xl">
+              CodeShare
             </div>
-            <h3 className='mb-4'>Connected</h3>
+            <h3 className='mb-4 mt-4 text-green-400'>Connected users</h3>
             <div className="clientsList ">
               {clients.map((client) => (
                 <Client
@@ -116,7 +116,7 @@ const EditorPage = () => {
         <button className="btn copyBtn" onClick={copy}>
           Copy ROOM ID
         </button>
-        <button className="btn leaveBtn" onClick={leaveRoom} >
+        <button className="btn bg-blue-500 leaveBtn" onClick={leaveRoom} >
           Leave
         </button>
       </div>
